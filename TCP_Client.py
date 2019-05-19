@@ -1,7 +1,6 @@
 # -*- coding:utf-8 -*-
 # 客户端
 from socket import *
-import random
 import time
 import sys
 
@@ -36,36 +35,25 @@ if __name__=='__main__':
             for i,s in g_socketList:
                 time.sleep(0.5)
                 msg = s.recv(1024)
-                # print("%d get the message:%s"%(i,msg))
-                # print(type(msg))
                 msg=str(msg)
-                strList=msg[msg.find('caculate:')+len('caculate:'):]
-                # print(type(strList))
+                print("port_id:%d get the message:%s" % (i, msg))
+                strNum=msg[msg.find('caculate:')+(len('caculate:')):-1]
                 randList=[]
-                old=0
-                retList=[]
+                dealNum=0
 
                 # 提取数据
-                for t in strList:
+                for t in strNum:
                     if t.isdigit():
-                        old*=10
-                        old+=int(t)
-                    elif t==',' or t==']':
-                        randList.append(old)
-                        old=0
-                print("--%d--get"%(i),end='')
-                print(randList)
+                        dealNum*=10
+                        dealNum+=int(t)
+                print("--%d--get"%(dealNum))
 
                 # 数据处理
-                for listTemp in randList:
-                    retTemp=listTemp,parityCheck(listTemp),getDouble(listTemp),checkSize10(listTemp)
-                    retList.append(str(retTemp))
-                    # print(retTemp)
-                    temp = bytes(str(retList).encode())
-                # print("--%d--send:" % (i))
+                retTemp=dealNum,parityCheck(dealNum),getDouble(dealNum),checkSize10(dealNum)
+                temp = bytes(str(retTemp).encode())
+                print("--%s--send:\n" %(temp))
                 s.send(temp)
-                # s.send(bytes(random.randint(0, 100)))
-            break
+
     except ConnectionAbortedError as err:
         print("{0}".format(err))
     except :

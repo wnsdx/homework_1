@@ -8,31 +8,18 @@ import re
 # 处理客户端的请求并执行事情
 def dealWithClient(newSocket,destAddr):
     # 向每个连接的客户端发送30个随机数
-    random_list = [random.randint(1,30) for i in range(30)]
-    newSocket.send(bytes((("%s,caculate:%s" % (str(destAddr), random_list)).encode())))
-    while True:
-        recvData = newSocket.recv(1024)
-        if recvData:
-            if(recvData==' '):
+    randomList = [random.randint(1,30) for i in range(30)]
+    for randonNum in randomList:
+        newSocket.send(bytes((("%s,caculate:%s" % (str(destAddr), randonNum)).encode())))
+        while True:
+            recvDate = newSocket.recv(1024)
+            if len(recvDate)==0:
+                print('the recvDate is:',recvDate)
                 pass
-            else:
-                print('recv[%s]:%s'%(str(destAddr), recvData.decode()))
-                pattern = re.compile(r'\d+')
-                res = pattern.findall(recvData.decode())
-                list=[];row=[];i=0
-                for tmp in res:
-                    i+=1
-                    row.append(tmp)
-                    if i >3:
-                        list.append(row)
-                        row = []
-                        i=0
-                print(list)
-        else:
-            print('[%s]客户端已经关闭'%str(destAddr))
-            break
-        break
-        pass
+            elif len(recvDate)!=0:
+                print('recv[%s]:%s' % (str(destAddr), recvDate.decode()))
+                break
+
     newSocket.close()
 def main():
     serSocket = socket(AF_INET, SOCK_STREAM)
@@ -42,9 +29,9 @@ def main():
     serSocket.listen(5)
     try:
         while True:
-            print('-----主进程，%s:%s，等待新客户端的到来------'%localAddr)
+            print('-----主进程，%s:%s，等待新客户端的到来------\n'%localAddr)
             newSocket,destAddr = serSocket.accept()
-            print('-----主进程，，接下来创建一个新的进程负责数据处理[%s]-----'%str(destAddr))
+            print('-----主进程，，接下来创建一个新的进程负责数据处理[%s]-----\n'%str(destAddr))
             client = Thread(target=dealWithClient, args=(newSocket,destAddr))
             client.start()
             #因为线程中共享这个套接字，如果关闭了会导致这个套接字不可用，
